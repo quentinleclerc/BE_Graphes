@@ -53,4 +53,31 @@ public class Noeud {
 		this.routes.add(road) ;
 		this.nbRoutes++ ; 
 	}
+
+	//Retourne la route la plus courte entre 2 nodes
+	public Route routePlusCourte (Noeud node2) {
+		int dist_min = Integer.MAX_VALUE ;
+		Route routeCourte = null ;
+		for(Route r : this.getRoutes()) {
+			if(r.getDest() == node2 && r.getDist() < dist_min) {
+				dist_min = r.getDist()	;
+				routeCourte = r ;
+			}
+		}
+		return routeCourte ;
+	}
+
+	//Retourne la route la plus rapide entre 2 nodes succéssifs :
+	public Route routePlusRapide ( Noeud node2) {
+		double temps_min = Double.MAX_VALUE ;
+		Route routeRapide = null ;
+		for(Route r : this.getRoutes()) {
+			if(r.getDest() == node2 && r.getTemps() < temps_min) {
+				temps_min = r.getDist()	;
+				routeRapide = r ;
+			}
+		}
+		return routeRapide ;
+	}
+
 }

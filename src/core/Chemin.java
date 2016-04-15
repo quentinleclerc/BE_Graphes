@@ -1,7 +1,7 @@
 package core;
 
 
-public class Chemin {
+public class Chemin { //On suppose un chemin entièrement inclus dans une même zone
 
 	private int id_carte ;
 	
@@ -25,38 +25,13 @@ public class Chemin {
 		 noeuds[index]=node ; 
 	}
 
-	//Retourne la route la plus courte entre 2 nodes
-	private Route routePlusCourte (Noeud node1, Noeud node2) {
-		int dist_min = Integer.MAX_VALUE ;
-		Route routeCourte = null ;
-		for(Route r : node1.getRoutes()) {
-			if(r.getDest() == node2 && r.getDist() < dist_min) {
-				dist_min = r.getDist()	;
-				routeCourte = r ; 
-			}
-		}
-		return routeCourte ; 
-	}
-	
-	//Retourne la route la plus rapide entre 2 nodes
-	private Route routePlusRapide (Noeud node1, Noeud node2) {
-		double temps_min = Double.MAX_VALUE ;
-		Route routeRapide = null ;
-		for(Route r : node1.getRoutes()) {
-			if(r.getDest() == node2 && r.getTemps() < temps_min) {
-				temps_min = r.getDist()	;
-				routeRapide = r ; 
-			}
-		}
-		return routeRapide ; 
-	}
-	
+
 	
 	// Retourne le cout métrique (en metres)
 	public double calculCoutDistance(){
 		int dist_totale = 0;
 		for(int i=0; i<nb_noeuds-1; i++){
-			dist_totale+=routePlusCourte(noeuds[i],noeuds[i+1]).getDist() ;
+			dist_totale+=noeuds[i].routePlusCourte(noeuds[i+1]).getDist() ;
 		}
 		return dist_totale;
 	}
@@ -65,7 +40,7 @@ public class Chemin {
 	public double calculCoutTemps(){
 		double temps_total = 0;
 		for(int i=0; i<nb_noeuds-1; i++){
-			temps_total+=routePlusRapide(noeuds[i],noeuds[i+1]).getTemps() ;
+			temps_total+=noeuds[i].routePlusRapide(noeuds[i+1]).getTemps() ;
 		}
 		return temps_total;
 	}
