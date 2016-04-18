@@ -1,5 +1,6 @@
 package core ;
 
+import java.awt.*;
 import java.io.* ;
 import java.util.*;
 
@@ -14,14 +15,11 @@ public class Pcc extends Algo {
     protected int zoneDestination ;
     protected int destination ;
 
-    // HashMap liant chaque noeud a son label
-    HashMap<Noeud, Label> map = new HashMap<Noeud, Label>() ;
+    // HashMap liant chaque noeud a son label, Key = noeud, valeur = label
+    private HashMap<Noeud, Label> map = new HashMap<Noeud, Label>() ;
 
     // Tas de label, on ajoute les noeud visités dans le tas
-    BinaryHeap<Label> tas = new BinaryHeap<Label>() ;
-
-    // Liste de tous les labels
-    ArrayList<Label> labs = new ArrayList<Label>() ;
+    private BinaryHeap<Label> tas = new BinaryHeap<Label>() ;
 
 
     public Pcc(Graphe gr, PrintStream sortie, Readarg readarg) {
@@ -40,61 +38,70 @@ public class Pcc extends Algo {
 
         System.out.println("Run PCC de " + zoneOrigine + ":" + origine + " vers " + zoneDestination + ":" + destination) ;
 
-        /**
-         * On insère dans le tas le noeud d'origine
-         */
-        Noeud n = graphe.getNoeuds()[origine] ;
-        Label current = new Label(false,0,null,n) ;
-        map.put(n, current) ;
+        // On insère dans le tas le noeud d'origine
+        Noeud or = graphe.getNoeuds()[origine] ;
+        Label current = new Label(false,0,null,or) ;
+        map.put(or, current) ;
         tas.insert(current) ;
 
+        graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),20);
 
         // Tant que le tas n'est pas vide et qu'on est pas au noeud de destination
         while (!tas.isEmpty() && (current.getNoeudCourant() != graphe.getNoeuds()[destination])) {
+
+            // On récupère le min du tas de succésseurs
             current = tas.deleteMin() ;
+            graphe.getDessin().setColor(Color.BLACK);
+            graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
             current.setMarquage(true) ;
 
-            // Affichage d'un point sur le noeud courant sur la carte
+            /* Debug : Affichage d'un point sur le noeud courant sur la carte et du numéro du noeud
+            graphe.getDessin().setColor(Color.BLACK) ;
             graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
+            graphe.getDessin().putText(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),"Noeud " + current.getNoeudCourant().getId());
+            */
 
             // Parcourir les noeuds succésseurs de current
-            // Pour chaque sommet v appartenant aux voisins de u faire
             for (Route r : current.getNoeudCourant().getRoutes() ){
 
-                Label lab_dest = new Label(r.getDest()) ;
-
-                if (!map.containsValue(lab_dest)) {
+                /* Si le label du noeud de destination n'est pas dans le hashmap,
+                 *  alors  :
+                 *  - on crée le label
+                 *  - on l'insère dans le tas, dans le hashmap
+                 */
+                if (!map.containsKey(r.getDest())) {
+                    Label lab_dest = new Label(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest()) ;
                     tas.insert(lab_dest) ;
                     map.put(r.getDest(), lab_dest) ;
                 }
-
-                // Cout de la route allant de current au succésseur
-                double cout = r.getTemps() + current.getCout() ;
-
-                // Si le cout est inférieur au cout actuel, on maj
-                if ( cout < lab_dest.getCout() ) {
-                    // MAJ du père et du cout
-                    lab_dest.setPere(current.getNoeudCourant());
-                //    System.out.println(current.getNoeudCourant().getId());
-                    lab_dest.setCout(cout) ;
-                }
-
-                // Si on est déja passé par ce label, il n'est plus dans le tas
-                // donc on ne l'update pas
-                if ( ! lab_dest.getMarquage() ) {
-                    tas.update(lab_dest) ;
+                /* Sinon si le label est dans le hashmap et que le cout est inférieur alors
+                 *  - on met à jour le père et le cout
+                 *  - on update le tas car on a changé la valeur des cout
+                 */
+                else {
+                    Label lab_dest = map.get(r.getDest()) ;
+                    Double nouveau_cout = current.getCout() + r.getTemps() ;
+                    if (lab_dest.getCout() > nouveau_cout) {
+                        lab_dest.setPere(current.getNoeudCourant()) ;
+                        lab_dest.setCout(nouveau_cout) ;
+                        tas.update(lab_dest) ;
+                    }
                 }
             }
         }
 
-        // Parcours en sens inverse grace au HashMap a partir de destination -> pere -> pere ... -> orgine
-        /* Tant qu'il y a un père on continue à remonter, on s'arrete au noeud origine,
-           qui à un père null
+        graphe.getDessin().drawPoint(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),20);
+
+        /**
+         *  Tant qu'il y a un père on continue à remonter, on s'arrete au noeud origine
          */
         Noeud dad = map.get(graphe.getNoeuds()[destination]).getPere() ;
-        System.out.println("Destination : "+ dad);
-        while (dad != graphe.getNoeuds()[origine]) {
+        System.out.println("Destination : " + dad.getId() ) ;
+
+        while (map.get(dad).getNoeudCourant() != graphe.getNoeuds()[origine]) {
             dad = map.get(dad).getPere() ;
+         //   graphe.getDessin().drawPoint(dad.getLongi(),dad.getLat(),20);
+            System.out.println("Père : " + dad.getId() );
         }
     }
 }

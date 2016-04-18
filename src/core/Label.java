@@ -23,13 +23,13 @@ public class Label implements Comparable<Label> {
     //Constructeur par défaut
     public Label(Noeud n) {
         marquage = false;
-        cout = Integer.MAX_VALUE;
+        cout = Double.MAX_VALUE ;
         pere = null;
         courant = n;
     }
 
     //Constructeur avec arguments
-    public Label(boolean marque, int coast, Noeud father, Noeud current) {
+    public Label(boolean marque, double coast, Noeud father, Noeud current) {
         marquage = marque;
         cout = coast;
         pere = father;
