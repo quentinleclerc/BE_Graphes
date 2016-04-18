@@ -40,9 +40,9 @@ public class Pcc extends Algo {
 
         System.out.println("Run PCC de " + zoneOrigine + ":" + origine + " vers " + zoneDestination + ":" + destination) ;
 
-         /* Parcourir tous les noeuds du graphe et créer un label pour chacun (distance = infinite)
-          *
-          */
+        /**
+         * On insère dans le tas le noeud d'origine
+         */
         Noeud n = graphe.getNoeuds()[origine] ;
         Label current = new Label(false,0,null,n) ;
         map.put(n, current) ;
@@ -50,11 +50,13 @@ public class Pcc extends Algo {
 
 
         // Tant que le tas n'est pas vide et qu'on est pas au noeud de destination
-        while (!tas.isEmpty() && current.getNoeudCourant() != graphe.getNoeuds()[destination]) {
+        while (!tas.isEmpty() && (current.getNoeudCourant() != graphe.getNoeuds()[destination])) {
             current = tas.deleteMin() ;
             current.setMarquage(true) ;
 
-            graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),10);
+            // Affichage d'un point sur le noeud courant sur la carte
+            graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
+
             // Parcourir les noeuds succésseurs de current
             // Pour chaque sommet v appartenant aux voisins de u faire
             for (Route r : current.getNoeudCourant().getRoutes() ){
@@ -73,7 +75,7 @@ public class Pcc extends Algo {
                 if ( cout < lab_dest.getCout() ) {
                     // MAJ du père et du cout
                     lab_dest.setPere(current.getNoeudCourant());
-                    System.out.println(current.getNoeudCourant().getId());
+                //    System.out.println(current.getNoeudCourant().getId());
                     lab_dest.setCout(cout) ;
                 }
 

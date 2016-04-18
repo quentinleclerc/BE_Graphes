@@ -24,27 +24,33 @@ public class BinaryHeap<E extends Comparable<E>> {
     // We have to use an ArrayList
     private ArrayList<E> array; // The heap array
 
+    private HashMap<E, Integer > map ;
+
     /**
      * Construct the binary heap.
      */
     public BinaryHeap() {
         this.currentSize = 0;
         this.array = new ArrayList<E>() ;
+        this.map = new HashMap<E, Integer>() ;
     }
 
     // Constructor used for debug.
     private BinaryHeap(BinaryHeap<E> heap) {
         this.currentSize = heap.currentSize ;
         this.array = new ArrayList<E>(heap.array) ;
+        this.map = new HashMap<E, Integer>() ;
     }
 
     // Sets an element in the array
     private void arraySet(int index, E value) {
         if (index == this.array.size()) {
             this.array.add(value) ;
+            this.map.put(value, index) ;
         }
         else {
             this.array.set(index, value) ;
+            this.map.put(value, index) ;
         }
     }
 
@@ -83,6 +89,7 @@ public class BinaryHeap<E extends Comparable<E>> {
     public void insert(E x) {
         int index = this.currentSize++ ;
         this.arraySet(index, x) ;
+        this.map.put(x, index) ;
         this.percolateUp(index) ;
     }
 
@@ -195,13 +202,19 @@ public class BinaryHeap<E extends Comparable<E>> {
         System.out.println() ;
     }
 
+    /**
+     * Get the position of an element in the heap
+     */
+    public int getElementPosition(E e) {
+        return this.map.get(e) ;
+    }
 
     /**
      * Update the heap when modifying an element
-     * @param E element modified
+     * @param element modified
      */
     public void update(E element) {
-        int index =  array.indexOf(element) ;
+        int index =  getElementPosition(element) ;
 
         percolateUp(index)  ;
         percolateDown(index) ;
