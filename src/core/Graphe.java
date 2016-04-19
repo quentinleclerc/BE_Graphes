@@ -37,6 +37,7 @@ public class Graphe {
 	public Dessin getDessin() { return dessin ; }
 	public int getZone() { return numzone ; }
 	public Noeud[] getNoeuds() { return noeuds ; }
+	public int getIdcarte() { return idcarte ; }
 
 	// Le constructeur cree le graphe en lisant les donnees depuis le DataInputStream
 	public Graphe (String nomCarte, DataInputStream dis, Dessin dessin) {
@@ -187,35 +188,37 @@ public class Graphe {
 	 *  A n'utiliser que pour faire du debug ou des tests ponctuels.
 	 *  Ne pas utiliser automatiquement a chaque invocation des algorithmes.
 	 */
-	public void situerClick() {
+	public int situerClick() {
 
 		System.out.println("Allez-y, cliquez donc.") ;
 
-		if (dessin.waitClick()) {
-			float lon = dessin.getClickLon() ;
-			float lat = dessin.getClickLat() ;
+		int noeud = 0;
 
-			System.out.println("Clic aux coordonnees lon = " + lon + "  lat = " + lat) ;
+		if (dessin.waitClick()) {
+			float lon = dessin.getClickLon();
+			float lat = dessin.getClickLat();
+
+			System.out.println("Clic aux coordonnees lon = " + lon + "  lat = " + lat);
 
 			// On cherche le noeud le plus proche. O(n)
-			float minDist = Float.MAX_VALUE ;
-			int   noeud   = 0 ;
+			float minDist = Float.MAX_VALUE;
 
-			for (int num_node = 0 ; num_node < noeuds.length ; num_node++) {
-				float londiff = (noeuds[num_node].getLongi() - lon) ;
-				float latdiff = (noeuds[num_node].getLat() - lat) ;
-				float dist = londiff*londiff + latdiff*latdiff ;
+			for (int num_node = 0; num_node < noeuds.length; num_node++) {
+				float londiff = (noeuds[num_node].getLongi() - lon);
+				float latdiff = (noeuds[num_node].getLat() - lat);
+				float dist = londiff * londiff + latdiff * latdiff;
 				if (dist < minDist) {
-					noeud = num_node ;
-					minDist = dist ;
+					noeud = num_node;
+					minDist = dist;
 				}
 			}
 
-			System.out.println("Noeud le plus proche : " + noeud) ;
-			System.out.println() ;
-			dessin.setColor(java.awt.Color.red) ;
-			dessin.drawPoint(noeuds[noeud].getLongi(),noeuds[noeud].getLat(), 5) ;
+			System.out.println("Noeud le plus proche : " + noeud);
+			System.out.println();
+			dessin.setColor(java.awt.Color.red);
+			dessin.drawPoint(noeuds[noeud].getLongi(), noeuds[noeud].getLat(), 5);
 		}
+		return noeud ;
 	}
 
 	/**
@@ -249,7 +252,7 @@ public class Graphe {
 			int last_zone  = dis.readUnsignedByte() ;
 			int last_node = Utils.read24bits(dis) ;
 			
-			Chemin monChem = new Chemin(path_carte, nb_noeuds, first_node, last_node);
+			Chemin monChem = new Chemin(path_carte, first_node, last_node);
  
 			System.out.println("Chemin de " + first_zone + ":" + first_node + " vers " + last_zone + ":" + last_node) ;
 
