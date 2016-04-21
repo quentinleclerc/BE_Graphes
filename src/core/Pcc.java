@@ -66,7 +66,7 @@ public class Pcc extends Algo {
      *  Affiche un point sur chaque noeud du chemin
      *  @return Chemin le chemin final, de destination vers origine
      */
-    private Chemin remontee() {
+    private Chemin remontee() throws PasDeCheminTrouveException {
 
         Chemin chem = new Chemin(graphe.getIdcarte(), origine, destination) ;
         Noeud dad = graphe.getNoeuds()[destination] ;
@@ -74,8 +74,14 @@ public class Pcc extends Algo {
         chem.addNoeud(dad, i) ;
 
         while (dad != graphe.getNoeuds()[origine]) {
-            dad = map.get(dad).getPere() ;
-            chem.addNoeud(dad,++i);
+            if (map.get(dad).getPere() != null) {
+                dad = map.get(dad).getPere() ;
+                chem.addNoeud(dad,++i);
+            }
+            else {
+                throw new PasDeCheminTrouveException("Aucun chemin n'a été trouvé entre ces deux points") ;
+            }
+
 
             // Affichage un point bleu sur les noeuds du chemin
             graphe.getDessin().setColor(Color.BLUE);
@@ -149,6 +155,11 @@ public class Pcc extends Algo {
         graphe.getDessin().putText(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),"Noeud destination " + graphe.getNoeuds()[destination].getId());
 
         // 3) Remontee à partir de la destination
-        remontee().printChemin() ;
+        try {
+            remontee().printChemin() ;
+        }
+        catch (PasDeCheminTrouveException e) {
+            System.out.println(e.getMessage()) ;
+        }
     }
 }
