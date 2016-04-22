@@ -65,7 +65,15 @@ public class Label implements Comparable<Label> {
     }
 
     public int compareTo(Label label) {
-        return (int) this.cout - (int) label.getCout();
+        if (this.cout - label.getCout() > 0 ) {
+            return 100 ;
+        }
+        else if (this.cout == (label.getCout()) ) {
+            return 0 ;
+        }
+        else {
+            return - 100 ;
+        }
     }
 
 }

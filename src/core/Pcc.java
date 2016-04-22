@@ -6,6 +6,8 @@ import java.util.*;
 
 import base.Readarg ;
 
+import javax.swing.*;
+
 public class Pcc extends Algo {
 
     // Numero des sommets origine et destination
@@ -32,7 +34,10 @@ public class Pcc extends Algo {
             this.origine = graphe.situerClick() ;
         }
         else {
-            this.origine = readarg.lireInt ("Numero du sommet d'origine ? ") ;
+            // Ouvre un panneau pour choisir le sommet d'origine
+            JOptionPane choixOrigine = new JOptionPane() ;
+            String str_origine = choixOrigine.showInputDialog(null, "Veuillez choisir le sommet d'origine", "Choix du sommet d'origine", JOptionPane.QUESTION_MESSAGE);
+            this.origine = Integer.parseInt(str_origine) ;
         }
 
         // Demander la zone et le sommet destination.
@@ -42,7 +47,10 @@ public class Pcc extends Algo {
             this.destination = graphe.situerClick() ;
         }
         else {
-            this.destination = readarg.lireInt ("Numero du sommet destination ? ");
+            // Ouvre un panneau pour choisir le nom du fichier de sortie
+            JOptionPane choixOrigine = new JOptionPane() ;
+            String str_dest = choixOrigine.showInputDialog(null, "Veuillez choisir le sommet de destination", "Choix du sommet de destination", JOptionPane.QUESTION_MESSAGE);
+            this.destination = Integer.parseInt(str_dest) ;
         }
 
     }
@@ -66,27 +74,23 @@ public class Pcc extends Algo {
      *  Affiche un point sur chaque noeud du chemin
      *  @return Chemin le chemin final, de destination vers origine
      */
-    private Chemin remontee() throws PasDeCheminTrouveException {
+    private Chemin remontee() {
 
         Chemin chem = new Chemin(graphe.getIdcarte(), origine, destination) ;
         Noeud dad = graphe.getNoeuds()[destination] ;
+        System.out.println("Cout du noeud destination : " + map.get(dad).getCout()) ;
         int i = 0 ;
         chem.addNoeud(dad, i) ;
 
         while (dad != graphe.getNoeuds()[origine]) {
-            if (map.get(dad).getPere() != null) {
-                dad = map.get(dad).getPere() ;
-                chem.addNoeud(dad,++i);
-            }
-            else {
-                throw new PasDeCheminTrouveException("Aucun chemin n'a été trouvé entre ces deux points") ;
-            }
-
+            dad = map.get(dad).getPere() ;
+            chem.addNoeud(dad,++i);
 
             // Affichage un point bleu sur les noeuds du chemin
             graphe.getDessin().setColor(Color.BLUE);
             graphe.getDessin().drawPoint(dad.getLongi(),dad.getLat(),10);
-        }
+            }
+
         return chem ;
     }
 
@@ -155,11 +159,11 @@ public class Pcc extends Algo {
         graphe.getDessin().putText(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),"Noeud destination " + graphe.getNoeuds()[destination].getId());
 
         // 3) Remontee à partir de la destination
-        try {
-            remontee().printChemin() ;
+        if (tas.isEmpty() ) {
+            System.out.println("Aucun chemin n'a été trouvé entre ces deux points") ;
         }
-        catch (PasDeCheminTrouveException e) {
-            System.out.println(e.getMessage()) ;
+        else {
+            remontee().printChemin() ;
         }
     }
 }

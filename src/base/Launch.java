@@ -88,12 +88,24 @@ public class Launch {
 				String menuChoisi = (String) choixMenu.showInputDialog(null, "Menu", "Menu", JOptionPane.QUESTION_MESSAGE, null, menu, menu[0]);
 
 				// Attribution du choix selon le string
-				if (menuChoisi.equals("Quitter")) {	choix = 0 ; }
-				else if (menuChoisi.equals("Composantes Connexes")) { choix = 1 ; }
-				else if (menuChoisi.equals("Plus court chemin standard")) {	choix = 2 ;	}
-				else if (menuChoisi.equals("Plus court chemin A-star")) { choix = 3 ; }
-				else if (menuChoisi.equals("Cliquer sur la carte pour obtenir un numero de sommet")) { choix = 4 ; }
-				else if (menuChoisi.equals("Charger un fichier de chemin (.path) et le verifier")) { choix = 5 ; }
+				if (menuChoisi.equals("Quitter")) {
+					choix = 0 ;
+				}
+				else if (menuChoisi.equals("Composantes Connexes")) {
+					choix = 1 ;
+				}
+				else if (menuChoisi.equals("Plus court chemin standard")) {
+					choix = 2 ;
+				}
+				else if (menuChoisi.equals("Plus court chemin A-star")) {
+					choix = 3 ;
+				}
+				else if (menuChoisi.equals("Cliquer sur la carte pour obtenir un numero de sommet")) {
+					choix = 4 ;
+				}
+				else if (menuChoisi.equals("Charger un fichier de chemin (.path) et le verifier")) {
+					choix = 5 ;
+				}
 
 
 				// Algorithme a executer
@@ -112,7 +124,10 @@ public class Launch {
 					case 4 : graphe.situerClick() ; break ;
 
 					case 5 :
-						String nom_chemin = this.readarg.lireString ("Nom du fichier .path contenant le chemin ? ") ;
+						File paths = new File("./paths") ;
+						JOptionPane choixChemin = new JOptionPane() ;
+						String nom_chemin = (String)choixChemin.showInputDialog(null,"Veuillez choisir votre chemin","Choix du chemin", JOptionPane.QUESTION_MESSAGE, null, paths.list(),paths.list()[0]) ;
+
 						graphe.verifierChemin(Openfile.open (nom_chemin), nom_chemin) ;
 						break ;
 
