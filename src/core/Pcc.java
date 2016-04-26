@@ -16,14 +16,17 @@ public class Pcc extends Algo {
 
     protected int zoneDestination ;
     protected int destination ;
+    
+    //Nombre de noeuds insérés dans le tas
+    protected int nb_noeuds_parcourus;
+    //Durée d'éxécution
+    protected long duree;
 
     // HashMap liant chaque noeud a son label, Key = noeud, valeur = label
-    private HashMap<Noeud, Label> map = new HashMap<>() ;
+    protected HashMap<Noeud, Label> map = new HashMap<>() ;
 
     // Tas de label, on ajoute les noeud visités dans le tas
-    private BinaryHeap<Label> tas = new BinaryHeap<>() ;
-
-    private boolean affichage ;
+    protected BinaryHeap<Label> tas = new BinaryHeap<>() ;
 
     public Pcc(Graphe gr, PrintStream sortie, Readarg readarg, boolean aff) {
         super(gr, sortie, readarg) ;
@@ -97,10 +100,13 @@ public class Pcc extends Algo {
     public void run() {
 
         System.out.println("Run PCC de " + zoneOrigine + ":" + origine + " vers " + zoneDestination + ":" + destination) ;
-
+      	//Pour mesurer le temps d'excéution
+        duree=System.currentTimeMillis();
+        
         // 1) Initialisation
         Label current = initialisation() ;
-
+        nb_noeuds_parcourus = 1; //Compte le nombre de noeuds parcourus, on met le noeud d'origine (iniialisation)
+        
         // On affiche un point bleu et un texte sur l'origine
         graphe.getDessin().setColor(Color.BLUE);
         graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),20);
@@ -112,7 +118,7 @@ public class Pcc extends Algo {
             // On récupère le min du tas de succésseurs et on le marque
             current = tas.deleteMin() ;
             current.setMarquage(true) ;
-
+            
             // Affichage d'un point sur le noeud parcouru
             graphe.getDessin().setColor(Color.BLACK);
             graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
@@ -136,6 +142,7 @@ public class Pcc extends Algo {
                     Label lab_dest = new Label(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest()) ;
                     tas.insert(lab_dest) ;
                     map.put(r.getDest(), lab_dest) ;
+                    nb_noeuds_parcourus++;
                 }
                 /* Sinon, si le label est dans le hashmap et que le cout est inférieur alors
                  *  - on met à jour le père et le cout
@@ -165,5 +172,9 @@ public class Pcc extends Algo {
         else {
             remontee().printChemin() ;
         }
+        System.out.println("PCC - Nombre de noeuds parcourus : " + nb_noeuds_parcourus + ".");
+      	//temps de calcul
+      	duree=(System.currentTimeMillis()-duree);
+      	System.out.println("PCC - Duree d'execution : " + duree + " ms");
     }
 }

@@ -1,13 +1,11 @@
 package core ;
 
-import java.util.HashMap;
-
-/**
- * (marquage, cout, pere, sommet courant)
- */
 public class Label implements Comparable<Label> {
-
-    //vrai si le sommet est définitivement ficé par l'algorithme
+	
+		//Estimation utile pour le LabelStar, nulle pour un simple label
+		protected double estimation; //Donnée en minutes
+		
+    //vrai si le sommet est définitivement fixé par l'algorithme
     private boolean marquage;
 
     //Valeur courante du chemin le plus court
@@ -26,6 +24,7 @@ public class Label implements Comparable<Label> {
         cout = Double.MAX_VALUE ;
         pere = null;
         courant = n;
+        estimation=0;
     }
 
     //Constructeur avec arguments
@@ -34,6 +33,7 @@ public class Label implements Comparable<Label> {
         cout = coast;
         pere = father;
         courant = current;
+        estimation=0;
     }
 
     public double getCout() {
@@ -63,6 +63,11 @@ public class Label implements Comparable<Label> {
     public void setCout(double cout) {
         this.cout = cout;
     }
+    
+    public double getEstimation(){
+    	return this.estimation ;
+    }
+    
 
     public int compareTo(Label label) {
         if (this.cout - label.getCout() > 0 ) {
