@@ -16,11 +16,15 @@ public class Pcc extends Algo {
 
     protected int zoneDestination ;
     protected int destination ;
-    
+
     //Nombre de noeuds insérés dans le tas
     protected int nb_noeuds_parcourus;
+
     //Durée d'éxécution
     protected long duree;
+
+    // Choix du parcours en temps ou distance
+    protected boolean coutDistance ; // Vrai => en distance, Faux => en temps
 
     // HashMap liant chaque noeud a son label, Key = noeud, valeur = label
     protected HashMap<Noeud, Label> map = new HashMap<>() ;
@@ -31,6 +35,12 @@ public class Pcc extends Algo {
     public Pcc(Graphe gr, PrintStream sortie, Readarg readarg, boolean aff) {
         super(gr, sortie, readarg) ;
 
+        // Choix de l'affichage ou non
+        JOptionPane choixCout = new JOptionPane() ;
+        String[] tempsDist = {"Temps", "Distance"} ;
+        coutDistance =  (1 == choixCout.showOptionDialog(null,"Voulez-vous afficher la carte ?","Choix de la sortie", JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,tempsDist,tempsDist[1])) ;
+
+        // Choix du parcours en temps ou distance
         this.zoneOrigine = gr.getZone () ;
         if (aff) {
             System.out.println("Veuillez cliquer sur le sommet d'origine.") ;
@@ -63,7 +73,7 @@ public class Pcc extends Algo {
      * On crée et insère dans le tas et hashmap le label origine
      * @return Label le label du noeud d'origine
      */
-    private Label initialisation() {
+    public Label initialisation() {
         // On insère dans le tas le noeud d'origine
         Noeud or = graphe.getNoeuds()[origine] ;
         Label current = new Label(false,0,null,or) ;
@@ -77,40 +87,59 @@ public class Pcc extends Algo {
      *  Affiche un point sur chaque noeud du chemin
      *  @return Chemin le chemin final, de destination vers origine
      */
-    private Chemin remontee() {
+    public void remontee() {
 
-        Chemin chem = new Chemin(graphe.getIdcarte(), origine, destination) ;
-        Noeud dad = graphe.getNoeuds()[destination] ;
-        System.out.println("Cout du noeud destination : " + map.get(dad).getCout()) ;
-        int i = 0 ;
-        chem.addNoeud(dad, i) ;
+        if (tas.isEmpty() ) {
+            System.out.println("Aucun chemin n'a été trouvé entre ces deux points") ;
+        }
+        else {
+            Chemin chem = new Chemin(graphe.getIdcarte(), origine, destination) ;
+            Noeud dad = graphe.getNoeuds()[destination] ;
+            int i = 0 ;
+            chem.addNoeud(dad, i) ;
 
-        while (dad != graphe.getNoeuds()[origine]) {
-            dad = map.get(dad).getPere() ;
-            chem.addNoeud(dad,++i);
-
-            // Affichage un point bleu sur les noeuds du chemin
-            graphe.getDessin().setColor(Color.BLUE);
-            graphe.getDessin().drawPoint(dad.getLongi(),dad.getLat(),10);
+            while (dad != graphe.getNoeuds()[origine]) {
+                dad = map.get(dad).getPere() ;
+                chem.addNoeud(dad,++i);
             }
 
-        return chem ;
+            chem.printChemin() ;
+            chem.printCheminCarte(graphe);
+            if (coutDistance) {
+                System.out.println("Cout du noeud destination en distance : " + map.get(graphe.getNoeuds()[destination]).getCout() + " mètres") ;
+            }
+            else {
+                System.out.println("Cout du noeud destination en temps : " + map.get(graphe.getNoeuds()[destination]).getCout()  + " minutes") ;
+            }
+
+        }
     }
 
-    public void run() {
+    /** Affiche le point d'origine et de destination sur la carte et les commentaires dans le terminal
+     * Il est identique dans PccStar donc pas redéfini
+     * @param algo Nom de l'algo : PCC, PCC-Star
+     */
+    public void affichage(String algo) {
+        System.out.println("Run " + algo + " de " + zoneOrigine + ":" + origine + " vers " + zoneDestination + ":" + destination) ;
 
-        System.out.println("Run PCC de " + zoneOrigine + ":" + origine + " vers " + zoneDestination + ":" + destination) ;
-      	//Pour mesurer le temps d'excéution
-        duree=System.currentTimeMillis();
-        
+        // On affiche un point bleu et un texte sur l'origine
+        graphe.getDessin().setColor(Color.BLUE) ;
+        graphe.getDessin().drawPoint(graphe.getNoeuds()[origine].getLongi(),graphe.getNoeuds()[origine].getLat(),20) ;
+        graphe.getDessin().putText(graphe.getNoeuds()[origine].getLongi(),graphe.getNoeuds()[origine].getLat(),"Noeud origine " + graphe.getNoeuds()[origine].getId());
+
+        // On affiche un point bleu et un texte sur la destination
+        graphe.getDessin().setColor(Color.BLUE) ;
+        graphe.getDessin().drawPoint(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),20) ;
+        graphe.getDessin().putText(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),"Noeud destination " + graphe.getNoeuds()[destination].getId());
+    }
+
+    public void algo() {
+        //Pour mesurer le temps d'excéution
+        duree = System.currentTimeMillis() ;
+
         // 1) Initialisation
         Label current = initialisation() ;
         nb_noeuds_parcourus = 1; //Compte le nombre de noeuds parcourus, on met le noeud d'origine (iniialisation)
-        
-        // On affiche un point bleu et un texte sur l'origine
-        graphe.getDessin().setColor(Color.BLUE);
-        graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),20);
-        graphe.getDessin().putText(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),"Noeud origine " + current.getNoeudCourant().getId());
 
         // 2) Boucle principale : tant que le tas n'est pas vide et qu'on est pas au noeud de destination
         while (!tas.isEmpty() && (current.getNoeudCourant() != graphe.getNoeuds()[destination])) {
@@ -118,17 +147,10 @@ public class Pcc extends Algo {
             // On récupère le min du tas de succésseurs et on le marque
             current = tas.deleteMin() ;
             current.setMarquage(true) ;
-            
+
             // Affichage d'un point sur le noeud parcouru
             graphe.getDessin().setColor(Color.BLACK);
             graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
-
-
-            /* Debug : Affichage d'un point sur le noeud courant sur la carte et du numéro du noeud
-            graphe.getDessin().setColor(Color.BLACK) ;
-            graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
-            graphe.getDessin().putText(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),"Noeud " + current.getNoeudCourant().getId());
-            */
 
             // Parcourir les noeuds succésseurs de current
             for (Route r : current.getNoeudCourant().getRoutes() ){
@@ -139,10 +161,17 @@ public class Pcc extends Algo {
                  *  - on l'insère dans le tas, dans le hashmap
                  */
                 if (!map.containsKey(r.getDest())) {
-                    Label lab_dest = new Label(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest()) ;
+                    Label lab_dest ;
+                    if (coutDistance) {
+                        lab_dest = new Label(false, current.getCout() + r.getDist(), current.getNoeudCourant(), r.getDest()) ;
+                    }
+                    else {
+                        lab_dest = new Label(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest()) ;
+                    }
+
                     tas.insert(lab_dest) ;
                     map.put(r.getDest(), lab_dest) ;
-                    nb_noeuds_parcourus++;
+                    nb_noeuds_parcourus++ ;
                 }
                 /* Sinon, si le label est dans le hashmap et que le cout est inférieur alors
                  *  - on met à jour le père et le cout
@@ -150,7 +179,13 @@ public class Pcc extends Algo {
                  */
                 else {
                     Label lab_dest = map.get(r.getDest()) ;
-                    Double nouveau_cout = current.getCout() + r.getTemps() ;
+                    double nouveau_cout ;
+                    if (coutDistance) {
+                        nouveau_cout = current.getCout() + r.getDist() ;
+                    }
+                    else {
+                        nouveau_cout = current.getCout() + r.getTemps() ;
+                    }
                     if (lab_dest.getCout() > nouveau_cout) {
                         lab_dest.setPere(current.getNoeudCourant()) ;
                         lab_dest.setCout(nouveau_cout) ;
@@ -159,22 +194,17 @@ public class Pcc extends Algo {
                 }
             }
         }
+    }
 
-        // On affiche un point bleu et un texte sur la destination
-        graphe.getDessin().setColor(Color.BLUE) ;
-        graphe.getDessin().drawPoint(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),20) ;
-        graphe.getDessin().putText(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),"Noeud destination " + graphe.getNoeuds()[destination].getId());
+    public void run() {
 
-        // 3) Remontee à partir de la destination
-        if (tas.isEmpty() ) {
-            System.out.println("Aucun chemin n'a été trouvé entre ces deux points") ;
-        }
-        else {
-            remontee().printChemin() ;
-        }
-        System.out.println("PCC - Nombre de noeuds parcourus : " + nb_noeuds_parcourus + ".");
-      	//temps de calcul
-      	duree=(System.currentTimeMillis()-duree);
-      	System.out.println("PCC - Duree d'execution : " + duree + " ms");
+        affichage(this.getClass().getCanonicalName()) ;
+        algo() ;
+        remontee() ;
+
+        System.out.println(this.getClass().getCanonicalName() + " - Nombre de noeuds parcourus : " + nb_noeuds_parcourus + ".");
+        //temps de calcul
+        duree=(System.currentTimeMillis()-duree);
+        System.out.println(this.getClass().getCanonicalName() + " - Duree d'execution : " + duree + " ms");
     }
 }

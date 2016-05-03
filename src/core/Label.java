@@ -2,19 +2,19 @@ package core ;
 
 public class Label implements Comparable<Label> {
 	
-		//Estimation utile pour le LabelStar, nulle pour un simple label
-		protected double estimation; //Donnée en minutes
+	// Estimation utile pour le LabelStar, nulle pour un simple label
+    protected double estimation; //Donnée en minutes
 		
-    //vrai si le sommet est définitivement fixé par l'algorithme
+    // Vrai si le sommet est définitivement fixé par l'algorithme
     private boolean marquage;
 
-    //Valeur courante du chemin le plus court
+    // Valeur courante du chemin le plus court
     private double cout;
 
-    //Sommet précédent correponsant au chemin le plus court
+    // Sommet précédent correponsant au chemin le plus court
     private Noeud pere;
 
-    //Sommet associé à ce label
+    // Sommet associé à ce label
     private Noeud courant;
 
 
@@ -33,8 +33,9 @@ public class Label implements Comparable<Label> {
         cout = coast;
         pere = father;
         courant = current;
-        estimation=0;
+        estimation = 0;
     }
+
 
     public double getCout() {
         return this.cout;
@@ -52,6 +53,10 @@ public class Label implements Comparable<Label> {
         return this.pere;
     }
 
+    public double getEstimation(){
+        return this.estimation ;
+    }
+
     public void setMarquage(boolean b) {
         this.marquage = b;
     }
@@ -63,17 +68,19 @@ public class Label implements Comparable<Label> {
     public void setCout(double cout) {
         this.cout = cout;
     }
-    
-    public double getEstimation(){
-    	return this.estimation ;
+
+    public void setEstimation(double est){
+        this.estimation = est ;
     }
-    
+
 
     public int compareTo(Label label) {
-        if (this.cout - label.getCout() > 0 ) {
+        double coutLab = this.getCout() + this.getEstimation() ;
+        double coutAutre = label.getCout() + label.getEstimation() ;
+        if (coutLab - coutAutre > 0 ) {
             return 100 ;
         }
-        else if (this.cout == (label.getCout()) ) {
+        else if (coutLab == coutAutre) {
             return 0 ;
         }
         else {

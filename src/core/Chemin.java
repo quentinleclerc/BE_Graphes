@@ -1,5 +1,6 @@
 package core;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Chemin { //On suppose un chemin entièrement inclus dans une même zone
@@ -48,6 +49,14 @@ public class Chemin { //On suppose un chemin entièrement inclus dans une même 
 	public void printChemin() {
 		for (Noeud n : noeuds) {
 			System.out.println(n.getId()) ;
+		}
+	}
+
+	public void printCheminCarte(Graphe gr) {
+		// Affichage un point bleu sur les noeuds du chemin
+		for (Noeud n : noeuds) {
+			gr.getDessin().setColor(Color.BLUE);
+			gr.getDessin().drawPoint(n.getLongi(),n.getLat(),10);
 		}
 	}
 }
