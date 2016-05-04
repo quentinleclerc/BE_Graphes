@@ -7,18 +7,4 @@ public class LabelStar extends Label {
         this.estimation = est ;
     }
 
-    public int compareTo(LabelStar label) {
-        double coutLab = this.getCout() + this.getEstimation() ;
-        double coutAutre = label.getCout() + label.getEstimation() ;
-        if (coutLab - coutAutre > 0 ) {
-            return 100 ;
-        }
-        else if (coutLab == coutAutre) {
-            return 0 ;
-        }
-        else {
-            return - 100 ;
-        }
-    }
-
 }

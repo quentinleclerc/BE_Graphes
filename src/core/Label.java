@@ -3,7 +3,8 @@ package core ;
 public class Label implements Comparable<Label> {
 	
 	// Estimation utile pour le LabelStar, nulle pour un simple label
-    protected double estimation; //Donnée en minutes
+	// Permet de traiter le méthode binaire CompareTo comme il le faut
+    protected double estimation; //Donnée en mètres
 		
     // Vrai si le sommet est définitivement fixé par l'algorithme
     private boolean marquage;

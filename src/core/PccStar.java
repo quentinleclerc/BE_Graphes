@@ -28,7 +28,7 @@ public class PccStar extends Pcc {
             current = new LabelStar(false,0,null,or,dest,dist) ;
         }
         else {
-            current = new LabelStar(false,0,null,or,dest,dist*1000*60*130) ;
+            current = new LabelStar(false,0,null,or,dest,(dist*1000*130)/60) ;
         }
         map.put(or, current) ;
         tas.insert(current) ;
@@ -68,10 +68,9 @@ public class PccStar extends Pcc {
                     Label lab_dest ;
                     if (coutDistance) {
                         lab_dest = new LabelStar(false, current.getCout() + r.getDist(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],estim) ;
-
                     }
                     else {
-                        lab_dest = new LabelStar(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],estim*1000*60*130) ;
+                        lab_dest = new LabelStar(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],(estim*1000*130)/60) ;
                     }
                     tas.insert(lab_dest) ;
                     map.put(r.getDest(), lab_dest) ;

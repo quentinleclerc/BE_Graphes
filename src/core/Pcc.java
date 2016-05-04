@@ -35,12 +35,12 @@ public class Pcc extends Algo {
     public Pcc(Graphe gr, PrintStream sortie, Readarg readarg, boolean aff) {
         super(gr, sortie, readarg) ;
 
-        // Choix de l'affichage ou non
+        // Choix du parcours en temps ou distance
         JOptionPane choixCout = new JOptionPane() ;
         String[] tempsDist = {"Temps", "Distance"} ;
         coutDistance =  (1 == choixCout.showOptionDialog(null,"Voulez-vous afficher la carte ?","Choix de la sortie", JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,tempsDist,tempsDist[1])) ;
 
-        // Choix du parcours en temps ou distance
+     // Choix de l'affichage ou non
         this.zoneOrigine = gr.getZone () ;
         if (aff) {
             System.out.println("Veuillez cliquer sur le sommet d'origine.") ;
@@ -111,7 +111,6 @@ public class Pcc extends Algo {
             else {
                 System.out.println("Cout du noeud destination en temps : " + map.get(graphe.getNoeuds()[destination]).getCout()  + " minutes") ;
             }
-
         }
     }
 
