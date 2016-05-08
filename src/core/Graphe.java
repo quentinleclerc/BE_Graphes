@@ -5,6 +5,7 @@ package core ;
  *   A vous de completer selon vos choix de conception.
  */
 
+import java.awt.*;
 import java.io.* ;
 import base.* ;
 
@@ -200,6 +201,8 @@ public class Graphe {
 
 			System.out.println("Clic aux coordonnees lon = " + lon + "  lat = " + lat);
 
+
+
 			// On cherche le noeud le plus proche. O(n)
 			float minDist = Float.MAX_VALUE;
 
@@ -212,6 +215,10 @@ public class Graphe {
 					minDist = dist;
 				}
 			}
+
+			this.getDessin().setColor(Color.BLUE) ;
+			this.getDessin().drawPoint(lon,lat,15) ;
+			this.getDessin().putText(this.getNoeuds()[noeud].getLongi(),this.getNoeuds()[noeud].getLat(),"Noeud " + noeud);
 
 			System.out.println("Noeud le plus proche : " + noeud);
 			System.out.println();

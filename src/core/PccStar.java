@@ -48,6 +48,8 @@ public class PccStar extends Pcc {
         // 2) Boucle principale : tant que le tas n'est pas vide et qu'on est pas au noeud de destination
         while (!tas.isEmpty() && (current.getNoeudCourant() != graphe.getNoeuds()[destination])) {
 
+            nb_max_tas = tas.size()>nb_max_tas?tas.size():nb_max_tas ;
+
             // On récupère le min du tas de succésseurs et on le marque
             current = tas.deleteMin() ;
             current.setMarquage(true) ;
@@ -70,7 +72,7 @@ public class PccStar extends Pcc {
                         lab_dest = new LabelStar(false, current.getCout() + r.getDist(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],estim) ;
                     }
                     else {
-                        lab_dest = new LabelStar(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],(estim*1000*130)/60) ;
+                        lab_dest = new LabelStar(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],(estim*60)/(130*1000)) ;
                     }
                     tas.insert(lab_dest) ;
                     map.put(r.getDest(), lab_dest) ;

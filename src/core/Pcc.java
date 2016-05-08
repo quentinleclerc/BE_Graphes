@@ -20,13 +20,15 @@ public class Pcc extends Algo {
     //Nombre de noeuds insérés dans le tas
     protected int nb_noeuds_parcourus;
 
+    protected int nb_max_tas = 0 ;
+
     //Durée d'éxécution
     protected long duree;
 
     // Choix du parcours en temps ou distance
     protected boolean coutDistance ; // Vrai => en distance, Faux => en temps
 
-    // HashMap liant chaque noeud a son label, Key = noeud, valeur = label
+    // HashMap liant chaque noeud a son label, Key = Noeud, Valeur = Label
     protected HashMap<Noeud, Label> map = new HashMap<>() ;
 
     // Tas de label, on ajoute les noeud visités dans le tas
@@ -38,9 +40,9 @@ public class Pcc extends Algo {
         // Choix du parcours en temps ou distance
         JOptionPane choixCout = new JOptionPane() ;
         String[] tempsDist = {"Temps", "Distance"} ;
-        coutDistance =  (1 == choixCout.showOptionDialog(null,"Voulez-vous afficher la carte ?","Choix de la sortie", JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,tempsDist,tempsDist[1])) ;
+        coutDistance =  (1 == choixCout.showOptionDialog(null,"Voulez-vous faire un parcours en temps ou en distance ?","Choix de la sortie", JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,tempsDist,tempsDist[1])) ;
 
-     // Choix de l'affichage ou non
+        // Choix de l'affichage ou non
         this.zoneOrigine = gr.getZone () ;
         if (aff) {
             System.out.println("Veuillez cliquer sur le sommet d'origine.") ;
@@ -61,8 +63,8 @@ public class Pcc extends Algo {
         }
         else {
             // Ouvre un panneau pour choisir le nom du fichier de sortie
-            JOptionPane choixOrigine = new JOptionPane() ;
-            String str_dest = choixOrigine.showInputDialog(null, "Veuillez choisir le sommet de destination", "Choix du sommet de destination", JOptionPane.QUESTION_MESSAGE);
+            JOptionPane choixDest = new JOptionPane() ;
+            String str_dest = choixDest.showInputDialog(null, "Veuillez choisir le sommet de destination", "Choix du sommet de destination", JOptionPane.QUESTION_MESSAGE);
             this.destination = Integer.parseInt(str_dest) ;
         }
 
@@ -87,31 +89,21 @@ public class Pcc extends Algo {
      *  Affiche un point sur chaque noeud du chemin
      *  @return Chemin le chemin final, de destination vers origine
      */
-    public void remontee() {
+    public Chemin remontee() {
+        Chemin chem = new Chemin(graphe.getIdcarte(), origine, destination) ;
+        Noeud dad = graphe.getNoeuds()[destination] ;
+        int i = 0 ;
+        chem.addNoeud(dad, i) ;
 
-        if (tas.isEmpty() ) {
-            System.out.println("Aucun chemin n'a été trouvé entre ces deux points") ;
+        while (dad != graphe.getNoeuds()[origine]) {
+            dad = map.get(dad).getPere() ;
+            chem.addNoeud(dad,++i);
         }
-        else {
-            Chemin chem = new Chemin(graphe.getIdcarte(), origine, destination) ;
-            Noeud dad = graphe.getNoeuds()[destination] ;
-            int i = 0 ;
-            chem.addNoeud(dad, i) ;
 
-            while (dad != graphe.getNoeuds()[origine]) {
-                dad = map.get(dad).getPere() ;
-                chem.addNoeud(dad,++i);
-            }
+        chem.printChemin() ;
+        chem.printCheminCarte(graphe);
 
-            chem.printChemin() ;
-            chem.printCheminCarte(graphe);
-            if (coutDistance) {
-                System.out.println("Cout du noeud destination en distance : " + map.get(graphe.getNoeuds()[destination]).getCout() + " mètres") ;
-            }
-            else {
-                System.out.println("Cout du noeud destination en temps : " + map.get(graphe.getNoeuds()[destination]).getCout()  + " minutes") ;
-            }
-        }
+        return chem ;
     }
 
     /** Affiche le point d'origine et de destination sur la carte et les commentaires dans le terminal
@@ -138,10 +130,12 @@ public class Pcc extends Algo {
 
         // 1) Initialisation
         Label current = initialisation() ;
-        nb_noeuds_parcourus = 1; //Compte le nombre de noeuds parcourus, on met le noeud d'origine (iniialisation)
+        nb_noeuds_parcourus = 1 ; //Compte le nombre de noeuds parcourus, on met le noeud d'origine (iniialisation)
 
         // 2) Boucle principale : tant que le tas n'est pas vide et qu'on est pas au noeud de destination
         while (!tas.isEmpty() && (current.getNoeudCourant() != graphe.getNoeuds()[destination])) {
+
+            nb_max_tas = tas.size()>nb_max_tas?tas.size():nb_max_tas ;
 
             // On récupère le min du tas de succésseurs et on le marque
             current = tas.deleteMin() ;
@@ -197,13 +191,33 @@ public class Pcc extends Algo {
 
     public void run() {
 
-        affichage(this.getClass().getCanonicalName()) ;
-        algo() ;
-        remontee() ;
+        if (origine == destination) {
+            System.out.println("L'origine et la destination sont identiques.") ;
+        }
+        else {
+            affichage(this.getClass().getCanonicalName()) ;
+            algo() ;
+            Chemin chem = remontee() ;
 
-        System.out.println(this.getClass().getCanonicalName() + " - Nombre de noeuds parcourus : " + nb_noeuds_parcourus + ".");
-        //temps de calcul
-        duree=(System.currentTimeMillis()-duree);
-        System.out.println(this.getClass().getCanonicalName() + " - Duree d'execution : " + duree + " ms");
+            System.out.println(this.getClass().getCanonicalName().equals("core.Pcc")?"Alorithme de Dijkstra - Pcc":"Algorithme A* - PccStar");
+            if (coutDistance) {
+                System.out.println("Chemin le plus court : ") ;
+                System.out.println("Distance : " + map.get(graphe.getNoeuds()[destination]).getCout() + " mètres") ;
+                System.out.println("Temps : " + chem.calculCoutTemps() + " minutes") ;
+            }
+            else {
+                System.out.println("Chemin le plus rapide : ") ;
+                System.out.println("Temps : " + map.get(graphe.getNoeuds()[destination]).getCout()  + " minutes") ;
+                System.out.println("Distance : " + chem.calculCoutDistance() + " mètres") ;
+            }
+            System.out.println("Nombre de noeuds parcourus : " + nb_noeuds_parcourus + ".");
+            System.out.println("Nombre de noeuds maximums dans le tas : "+ nb_max_tas + ".") ;
+
+            // temps de calcul
+            duree = (System.currentTimeMillis() - duree);
+            System.out.println("Duree d'execution : " + duree + " ms");
+        }
+
+
     }
 }
