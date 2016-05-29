@@ -20,6 +20,14 @@ public class Label implements Comparable<Label> {
 
 
     //Constructeur par défaut
+    public Label() {
+        marquage = false;
+        cout = Double.MAX_VALUE ;
+        pere = null;
+        estimation = 0;
+    }
+
+    //Constructeur par défaut
     public Label(Noeud n) {
         marquage = false;
         cout = Double.MAX_VALUE ;

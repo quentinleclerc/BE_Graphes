@@ -44,7 +44,7 @@ public class Chemin { //On suppose un chemin entièrement inclus dans une même 
 	public double calculCoutTemps(){
 		double temps_total = 0;
 		for(int i = nb_noeuds - 1; i > 0; i--){
-			temps_total += noeuds.get(i).routePlusRapide(noeuds.get(i-1)).getTemps() ;
+			temps_total += noeuds.get(i).routePlusRapide(noeuds.get(i-1)).getTemps(0) ;
 		}
 		return temps_total;
 	}
@@ -58,8 +58,8 @@ public class Chemin { //On suppose un chemin entièrement inclus dans une même 
 	public void printCheminCarte(Graphe gr) {
 		// Affichage un point bleu sur les noeuds du chemin
 		for (Noeud n : noeuds) {
-			gr.getDessin().setColor(Color.BLUE);
-			gr.getDessin().drawPoint(n.getLongi(),n.getLat(),10);
+			gr.getDessin().setColor(Color.GREEN);
+			gr.getDessin().drawPoint(n.getLongi(),n.getLat(),7);
 		}
 	}
 }

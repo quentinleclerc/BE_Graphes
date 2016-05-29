@@ -4,10 +4,11 @@ import java.awt.Color;
 import java.io.* ;
 import base.Readarg ;
 
+
 public class PccStar extends Pcc {
 
-    public PccStar(Graphe gr, PrintStream sortie, Readarg readarg, boolean aff) {
-        super(gr, sortie, readarg, aff ) ;
+    public PccStar(Graphe gr, PrintStream sortie, Readarg readarg, boolean aff, int mode) {
+        super(gr, sortie, readarg, aff, mode ) ;
     }
 
     /**
@@ -55,24 +56,28 @@ public class PccStar extends Pcc {
             current.setMarquage(true) ;
 
             // Affichage d'un point sur le noeud parcouru
-            graphe.getDessin().setColor(Color.RED);
-            graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),5);
+            //graphe.getDessin().setColor(Color.BLUE);
+            //graphe.getDessin().drawPoint(current.getNoeudCourant().getLongi(),current.getNoeudCourant().getLat(),2);
 
             // Parcourir les noeuds successeurs de current
             for (Route r : current.getNoeudCourant().getRoutes() ){
                 double estim = graphe.distance(graphe.getNoeuds()[destination].getLongi(),graphe.getNoeuds()[destination].getLat(),r.getDest().getLongi(),r.getDest().getLat()) ;
-              /* Si le label du noeud de destination n'est pas dans le hashmap,
-               *  alors  :
-               *  - on crée le label
-               *  - on l'insère dans le tas, dans le hashmap
-               */
+
+                // On modifie la vitesse selon le mode choisi
+                r.getDescr().setVitMax(vitesseMax) ;
+
+                /* Si le label du noeud de destination n'est pas dans le hashmap,
+                *  alors  :
+                *  - on crée le label
+                *  - on l'insère dans le tas, dans le hashmap
+                */
                 if (!map.containsKey(r.getDest())) {
                     Label lab_dest ;
                     if (coutDistance) {
                         lab_dest = new LabelStar(false, current.getCout() + r.getDist(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],estim) ;
                     }
                     else {
-                        lab_dest = new LabelStar(false, current.getCout() + r.getTemps(), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],(estim*60)/(130*1000)) ;
+                        lab_dest = new LabelStar(false, current.getCout() + r.getTemps(vitesseMax), current.getNoeudCourant(), r.getDest(), graphe.getNoeuds()[destination],(estim*60)/(130*1000)) ;
                     }
                     tas.insert(lab_dest) ;
                     map.put(r.getDest(), lab_dest) ;
@@ -90,7 +95,7 @@ public class PccStar extends Pcc {
                         nouveau_cout = current.getCout() + r.getDist()  ;
                     }
                     else {
-                        nouveau_cout = current.getCout() + r.getTemps() ;
+                        nouveau_cout = current.getCout() + r.getTemps(vitesseMax) ;
                     }
 
                     if (lab_dest.getCout()  > nouveau_cout ) {

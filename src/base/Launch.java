@@ -84,7 +84,7 @@ public class Launch {
 								"Plus court chemin standard",
 								"Plus court chemin A-star",
 								"Cliquer sur la carte pour obtenir un numero de sommet",
-								"Charger un fichier de chemin (.path) et le verifier" } ;
+								"Charger un fichier de chemin (.path) et le verifier", "Problème du covoiturage" } ;
 				String menuChoisi = (String) choixMenu.showInputDialog(null, "Menu", "Menu", JOptionPane.QUESTION_MESSAGE, null, menu, menu[0]);
 
 				// Attribution du choix selon le string
@@ -106,6 +106,9 @@ public class Launch {
 				else if (menuChoisi.equals("Charger un fichier de chemin (.path) et le verifier")) {
 					choix = 5 ;
 				}
+				else if (menuChoisi.equals("Problème du covoiturage")) {
+					choix = 6 ;
+				}
 
 
 				// Algorithme a executer
@@ -117,9 +120,9 @@ public class Launch {
 
 					case 1 : algo = new Connexite(graphe, this.fichierSortie (), this.readarg) ; break ;
 
-					case 2 : algo = new Pcc(graphe, this.fichierSortie (), this.readarg, display) ; break ;
+					case 2 : algo = new Pcc(graphe, this.fichierSortie (), this.readarg, display, 0) ; break ;
 
-					case 3 : algo = new PccStar(graphe, this.fichierSortie (), this.readarg, display) ; break ;
+					case 3 : algo = new PccStar(graphe, this.fichierSortie (), this.readarg, display, 0) ; break ;
 
 					case 4 : graphe.situerClick() ; break ;
 
@@ -130,6 +133,8 @@ public class Launch {
 
 						graphe.verifierChemin(Openfile.open (nom_chemin), nom_chemin) ;
 						break ;
+
+					case 6 : algo = new Covoit(graphe, this.fichierSortie(), this.readarg, display) ; break ;
 
 					default:
 						System.out.println ("Choix de menu incorrect : " + choix) ;

@@ -72,8 +72,8 @@ public class Noeud {
 		double temps_min = Double.MAX_VALUE ;
 		Route routeRapide = null ;
 		for(Route r : this.getRoutes()) {
-			if(r.getDest() == node2 && r.getTemps() < temps_min) {
-				temps_min = r.getTemps() ;
+			if(r.getDest() == node2 && r.getTemps(0) < temps_min) {
+				temps_min = r.getTemps(0) ;
 				routeRapide = r ;
 			}
 		}

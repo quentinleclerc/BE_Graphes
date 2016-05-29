@@ -216,9 +216,9 @@ public class Graphe {
 				}
 			}
 
-			this.getDessin().setColor(Color.BLUE) ;
-			this.getDessin().drawPoint(lon,lat,15) ;
-			this.getDessin().putText(this.getNoeuds()[noeud].getLongi(),this.getNoeuds()[noeud].getLat(),"Noeud " + noeud);
+		//	this.getDessin().setColor(Color.BLUE) ;
+		//	this.getDessin().drawPoint(lon,lat,15) ;
+		//	this.getDessin().putText(this.getNoeuds()[noeud].getLongi(),this.getNoeuds()[noeud].getLat(),"Noeud " + noeud);
 
 			System.out.println("Noeud le plus proche : " + noeud);
 			System.out.println();
